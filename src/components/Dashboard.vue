@@ -18,7 +18,7 @@
         xs9
         d-flex
       >
-        <Information/>
+        <Information :tier="tier"/>
       </v-flex>
     </v-layout>
   </v-container>
