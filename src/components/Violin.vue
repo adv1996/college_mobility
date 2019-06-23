@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  /* eslint-disable */ 
   import CollegeMobility from '../data/college_mobility.json';
   import _ from 'lodash';
   import * as d3 from 'd3';
@@ -37,16 +38,6 @@
             id: 'tier' + d.tier
           }
         }), 'k_pctile')
-        this.extents = _.mapValues(this.data, (d) => {
-          let extent = d3.extent(d, d => d.density)
-          return {
-            id: d[0].id,
-            k: d[0].k_pctile,
-            min: extent[0],
-            max: extent[1],
-            total: _.find(d, ['tier_name', 'Selective private']).count
-          }
-        })
       },
       initGraph() {
         const h = this.height - this.margin.top - this.margin.bottom;
@@ -141,17 +132,6 @@
         let legend = g.selectAll('legend')
           .data(['65'])
           .enter().append('g')
-
-        legend.selectAll('legend_rect')
-          .data(function(d) {
-            return that.data[d]
-          })
-          .enter().append('rect')
-          .attr('class', 'bar')
-          .attr('x', (d) => - legendXScale(d.density) / 2 + 600)
-          .attr('y', (d) => this.yScale(d.id))
-          .attr('width', (d) => legendXScale(d.density))
-          .attr('height', 12.5)
         
         legend.selectAll('labels')
           .data(function(d) {
@@ -159,7 +139,7 @@
           })
           .enter().append('text')
           .attr('class', 'caption')
-          .attr('x', (d) => - legendXScale(d.density) / 2 + 610 + legendXScale(d.density))
+          .attr('x', (d) => - legendXScale(d.density) / 2 + 210 + legendXScale(d.density))
           .attr('y', (d) => this.yScale(d.id))
           .attr('dy', 10)
           .text((d) => d.tier_name)
@@ -182,11 +162,11 @@
           .attr('class', 'caption')
           .text('Parental Income Percentiles')
         
-        g.append('text')
-          .attr('x', this.margin.right)
-          .attr('y', h / 2)
-          .attr('class', 'caption')
-          .text('Number of Students')
+        // g.append('text')
+        //   .attr('x', this.margin.right)
+        //   .attr('y', h / 2)
+        //   .attr('class', 'caption')
+        //   .text('Number of Students')
       },
       getWidth(percentile, value) {
         let extent = this.extents[percentile]

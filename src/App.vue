@@ -1,26 +1,18 @@
 <template>
   <v-app>
     <v-content>
-      <Violin/>
-      <Brush/>
+      <Dashboard/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import Violin from '../src/components/Violin.vue';
-import Brush from '../src/components/Brush.vue';
+import Dashboard from '../src/components/Dashboard';
 
 export default {
   name: 'App',
   components: {
-    Violin,
-    Brush,
+    Dashboard,
   },
-  data () {
-    return {
-      //
-    }
-  }
 }
 </script>

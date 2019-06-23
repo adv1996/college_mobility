@@ -1,41 +1,46 @@
 <template>
-  <div>
+  <v-card
+    color="white"
+    tile
+    height="400"
+  >
     <svg id="brush"/>
-  </div>
+  </v-card>
 </template>
 
 <script>
-  import CollegeMobility from '../data/college_mobility.json';
-  import _ from 'lodash';
   import * as d3 from 'd3';
 
   export default {
     data() {
       return {
-        height: 100,
-        width: 2200,
-        xScale: null,
-        yScale: null,
-        margin: {top: 50, right: 20, bottom: 20, left: 150},
+        height: null,
+        width: null,
+        margin: {top: 20, right: 40, bottom: 20, left: 20},
       }
     },
     mounted () {
+      this.setDimensions();
       this.initGraph();
     },
     methods: {
+      setDimensions() {
+        this.width = this.$el.offsetWidth
+        this.height = this.$el.offsetHeight
+      },
       initGraph() {
         const h = this.height - this.margin.top - this.margin.bottom;
         const w = this.width - this.margin.right - this.margin.left;
         
         const svg = d3.select('#brush')
-          .attr('height', this.height + this.margin.top + this.margin.bottom)
-          .attr('width', this.width + this.margin.left + this.margin.right)
+          .attr('height', this.height)
+          .attr('width', this.width)
         
         const g = svg.append('g')
           .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
 
         let brush = d3.brushX()
-          .extent([[0, 0], [this.width, this.height]])
+          .extent([[0, this.height / 4], [w, this.height / 2]])
           .on("end", this.brushed);
 
         this.xScale = d3.scaleLinear()
@@ -44,7 +49,7 @@
         
         g.append('g')
           .attr('class', 'xAxisLine')
-          .attr("transform", "translate(0," + h + ")")
+          .attr("transform", "translate(" + 0 + "," + h / 2 + ")")
           .call(d3.axisBottom(this.xScale));
         
         g.append("g")
@@ -53,17 +58,15 @@
           .call(brush.move, this.xScale.range());
       },
       brushed() {
-        console.log('brushed');
         if (d3.event.selection) {
-          console.log(d3.event.selection)
-        } else {
-          console.log('no event specified')
+          let boundaries = d3.event.selection;
+          this.$store.dispatch('setBoundary', [parseInt(this.xScale.invert(boundaries[0])), parseInt(this.xScale.invert(boundaries[1]))])
         }
       }
     },
   }
 </script>
 
-<style>
+<style lang="scss" scoped>
 
 </style>
