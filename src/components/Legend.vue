@@ -2,7 +2,7 @@
   <v-card
     color="white"
     tile
-    height="400"
+    height="430"
   >
     <svg id="legend"/>
   </v-card>
@@ -55,6 +55,8 @@
             .attr('x', (d) => this.legendXScale(this.legendExtent[1]) - this.legendXScale(d.density) / 2 + w / 4)
             .attr('width', (d) => this.legendXScale(d.density))
         bars.exit().remove()
+
+        d3.select('#legend_percentile').text(this.percentage);
       },
     },
     mounted () {
@@ -131,7 +133,31 @@
           .style('opacity', (d) => {
             return d.tier_name === this.$store.getters.tier ? 1 : 0.3;
           })
-          
+        
+        // legend label
+        g.append('text')
+          .attr('x', this.legendXScale(this.legendExtent[1]) + w / 4)
+          .attr('y', 4 * h / 5 + 24)
+          .text(this.percentage)
+          .attr('id', 'legend_percentile')
+          .attr('class', 'headline')
+          .style('text-anchor', 'middle')
+        
+        //tiers label
+        g.append('text')
+          .attr('x', w / 4)
+          .attr('y', 4 * h / 5 + 24)
+          .text('Higher Education Tiers')
+          .attr('class', 'subheading')
+          .style('text-anchor', 'middle')
+
+        //main label
+        g.append('text')
+          .attr('x', w / 2)
+          .attr('y', this.margin.top)
+          .text('Relative Distribution of College Tiers per Parental Income Percentile')
+          .attr('class', 'subheading')
+          .style('text-anchor', 'middle')
         
         legendBars.selectAll('labels')
           .data(function(d) {

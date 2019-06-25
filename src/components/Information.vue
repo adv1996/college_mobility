@@ -2,7 +2,7 @@
   <v-card
     color="white"
     tile
-    height="400"
+    height="430"
   >
     <svg id="brush"/>
   </v-card>
@@ -64,6 +64,13 @@
           .attr("transform", "translate(" + this.margin.left + "," + h/2 + ")")
           .attr('class', 'brush_group')
 
+        svg.append('text')
+          .attr('x', w/2)
+          .attr('y', this.margin.top)
+          .text('Brush Selection')
+          .attr('class', 'subheading')
+          .style('text-anchor', 'middle')
+
         let brush = d3.brushX()
           .extent([[0, 0], [w, this.height/4]])
           .on("end", this.brushed)
@@ -107,7 +114,7 @@
               .on("end", dragended));
 
         circleGroup.append("circle")
-            .attr('r', 5)
+            .attr('r', 8)
             .attr('class', 'pointer')
 
         circleGroup.append("text")
@@ -176,6 +183,6 @@
   fill: lightsteelblue;
 }
 .pointer {
-  fill: darkgreen;
+  fill: darkorange;
 }
 </style>

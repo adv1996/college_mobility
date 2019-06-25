@@ -253,9 +253,17 @@
         
         g.append('text')
           .attr('class', 'headline')
-          .attr('x', this.width / 3)
+          .attr('x', this.width / 2)
           .attr('y', this.margin.top)
-          .text('College Distribution based on Parental Income')
+          .style('text-anchor', 'middle')
+          .text('Comparing Higher Education Distribution Tiers across Parental Income Percentiles')
+        
+        // g.append('text')
+        //   .attr('class', 'caption')
+        //   .attr('x', this.width / 3)
+        //   .attr('y', this.margin.top)
+        //   .text('Compare Higher Education Tiers across Parental Income Percentiles')
+        //   .style('text-anchor', 'middle')
       },
       getWidth(percentile, value) {
         let extent = this.extents[percentile]

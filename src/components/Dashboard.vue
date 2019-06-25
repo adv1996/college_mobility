@@ -2,20 +2,17 @@
   <v-container fluid grid-list-sm>
     <v-layout row wrap>
       <v-flex
-        xs12
-        d-flex
+        sm12 lg12
       >
         <Distribution :data="data" :tier="tier" :boundary="count"/>
       </v-flex>
       <v-flex
-        xs4
-        d-flex
+        sm12 lg4
       >
         <Legend :data="data[percentage]" :percentage="percentage"/>
       </v-flex>
       <v-flex
-        xs8
-        d-flex
+        sm12 lg8
       >
         <Information :tier="tier" :data="data"/>
       </v-flex>
@@ -101,6 +98,6 @@ div.tooltip {
   pointer-events: none;			
 }
 .selection {
-  fill: lightgreen;
+  fill: darkorange;
 }
 </style>
