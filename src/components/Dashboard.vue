@@ -1,6 +1,5 @@
 <template>
   <v-container fluid grid-list-sm>
-    {{`${count} and ${tier}`}}
     <v-layout row wrap>
       <v-flex
         xs12
@@ -9,16 +8,16 @@
         <Distribution :data="data" :tier="tier" :boundary="count"/>
       </v-flex>
       <v-flex
-        xs3
+        xs4
         d-flex
       >
-        <Legend :data="data['65']"/>
+        <Legend :data="data[percentage]" :percentage="percentage"/>
       </v-flex>
       <v-flex
-        xs9
+        xs8
         d-flex
       >
-        <Information :tier="tier"/>
+        <Information :tier="tier" :data="data"/>
       </v-flex>
     </v-layout>
   </v-container>
@@ -30,6 +29,7 @@
   import Information from '../components/Information'
   import Legend from '../components/Legend'
   import _ from 'lodash';
+  import * as d3 from 'd3';
 
   export default {
     data() {
@@ -44,6 +44,7 @@
     },
     created () {
       this.setData();
+      this.setTooltip();
     },
     computed: {
       count () {
@@ -52,6 +53,9 @@
       tier () {
         return this.$store.getters.tier
       },
+      percentage () {
+        return this.$store.getters.percentage
+      }
     },
     methods: {
       setData() {
@@ -67,6 +71,12 @@
           }
         }), 'k_pctile')
       },
+      setTooltip() {
+        d3.select('body')
+          .append('div')
+          .attr('class', 'tooltip')	
+          .style('opacity', 0)
+      },
     },
   }
 </script>
@@ -77,5 +87,20 @@
 }
 .violin {
   fill: #2b8cbe;
+}
+div.tooltip {	
+  position: absolute;
+  text-align: center;		
+  padding: 2px;				
+  font-size: 12px;		
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  color: black;
+  background:white;
+  border: 3px solid darkblue;		
+  border-radius: 2px;	
+  pointer-events: none;			
+}
+.selection {
+  fill: lightgreen;
 }
 </style>

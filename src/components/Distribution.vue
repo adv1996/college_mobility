@@ -19,12 +19,14 @@
       return {
         height: null,
         width: null,
-        margin: {top: 20, right: 40, bottom: 20, left: 40},
+        margin: {top: 20, right: 40, bottom: 45, left: 40},
         extents: null,
         xaxis: null,
         area: null,
         valueline: null,
         violinYScale: null,
+        yScale: null,
+        yaxis: null,
       }
     },
     created () {
@@ -36,11 +38,30 @@
     },
     watch: {
       tier: function() {
-          console.log('tier change');
-          let svg = d3.select('#violin')
-          svg.selectAll("*").remove();
-          this.setData();
-          this.initGraph();
+        this.setData();
+        let extents = d3.extent(Object.values(this.extents), (d) => d.total)
+
+        this.yScale.domain([extents[1],0])
+
+        let values = d3.select('.main_group').selectAll('.area')
+          .data([Object.values(this.extents)])  
+        values.enter().append('path')
+          .merge(values)
+            .attr("class", "area")
+            .attr("d", this.area);
+        values.exit().remove()
+        
+        let lineValues = d3.select('.main_group').selectAll('.line')
+          .data([Object.values(this.extents)])
+        lineValues.enter().append('path')
+          .merge(lineValues)
+            .attr("class", "line")
+            .attr("d", this.valueline);
+        lineValues.exit().remove()
+
+        d3.select('.yAxisLine')
+          .transition(1000)
+          .call(this.yaxis);
       },
       boundary: function(newValue, oldValue) {
         this.xscale.domain([this.boundary[0] - 1, this.boundary[1] + 1]);
@@ -48,7 +69,9 @@
           .attr("d", this.area)
         d3.selectAll(".line")
           .attr("d", this.valueline)
-        d3.select(".xAxisLine").call(this.xaxis);
+        d3.select(".xAxisLine")
+          .transition(1000)
+          .call(this.xaxis);
 
         if (!_.isEqual(newValue, oldValue)) {
           let violinPlots = d3.select('.main_group').selectAll('.plots')
@@ -61,8 +84,7 @@
 
           let that = this;
           let violin = violinPlots.selectAll('.violin')
-            .data(function(d,i) {
-              console.log(i)
+            .data(function(d) {
               return that.data[d]
             })
           violin.enter().append('rect')
@@ -73,7 +95,7 @@
               .attr('x', (d) =>  {
                 return this.xscale(d.k_pctile) - this.getWidth(d.k_pctile, d.density) / 2;
               })
-              .attr('y', (d) => this.violinYScale(d.id) + this.margin.top)
+              .attr('y', (d) => this.violinYScale(d.id))
               .attr('width', (d) => this.getWidth(d.k_pctile, d.density))
               .attr('height', 4)
           violin.exit().remove()
@@ -83,17 +105,14 @@
     },
     methods: {
       verfiyDomain(bound) {
-        console.log(bound)
         let clamp = (bound[1] - bound[0]) / 12
         if (bound[0] < 9) {
           bound[0] = 9
         }
         let range = d3.range(bound[0], bound[1] + 1, Math.ceil(clamp))
-        console.log(bound[0], bound[1], range);
         range = _.filter(range, (d) => {
           return d === 9 || (d >= 18 && d < 100)
         })
-        console.log(range);
         return _.map(range, d => d.toString())
       },
       setData() {
@@ -137,21 +156,21 @@
 
         let extents = d3.extent(Object.values(this.extents), (d) => d.total)
         
-        let yScale = d3.scaleLinear()
+        this.yScale = d3.scaleLinear()
           .domain([extents[1], 0])
           .range([this.margin.top, h])
-        
+        this.yaxis = d3.axisLeft(this.yScale)
         // y scale for violin plots to band the tiers
         this.violinYScale = d3.scaleBand()
           .domain(_.map(this.data['9'], 'id'))
-          .range([h - 100, h - this.margin.bottom])
+          .range([h - 75, h])
         
         this.valueline = d3.line()
           .x((d) => {
             return this.xscale(d.k);
           })
           .y((d) => {
-            return yScale(d.total);
+            return this.yScale(d.total);
           });
         
         this.area = d3.area()
@@ -159,7 +178,7 @@
             return this.xscale(d.k);
           })
           .y0(h)
-          .y1((d) => { return yScale(d.total); });
+          .y1((d) => { return this.yScale(d.total); });
 
         let values = g.append('g')
           values.attr("clip-path", "url(#clip)")
@@ -171,7 +190,7 @@
 
         let lineValues = g.append('g')
           lineValues.attr("clip-path", "url(#clip)")
-          lineValues.selectAll('lines')
+          lineValues.selectAll('line')
             .data([Object.values(this.extents)])
             .enter().append('path')
             .attr("class", "line")
@@ -184,7 +203,7 @@
           .enter().append('g')
           .attr("transform", (d) => "translate(" + 0 + "," + 0 + ")")
           .attr('class', 'plots')
-        
+        let tooltip = d3.select('.tooltip')
         plots
           .selectAll('violin')
           .data(function(d) {
@@ -195,9 +214,21 @@
           .attr('x', (d) => {
             return this.xscale(d.k_pctile) - this.getWidth(d.k_pctile, d.density) / 2
           })
-          .attr('y', (d) => this.violinYScale(d.id) + this.margin.top)
+          .attr('y', (d) => this.violinYScale(d.id))
           .attr('width', (d) => this.getWidth(d.k_pctile, d.density))
           .attr('height', 4)
+          .on('mouseover', (d) => {
+            tooltip
+              .style("left", (d3.event.pageX + 25) + "px")	
+              .style("top", (d3.event.pageY - 25) + "px")
+              .style('opacity', 1)
+              .style('height', 75)
+              .html(d.tier_name + '<br>' + 'Density: ' + d.density.toFixed(4) + '<br>' + 'Total: ' + d.count)
+          })
+          .on('mouseout', () => {
+            tooltip
+              .style('opacity', 0)
+          })
 
         g.append('g')
           .attr('class', 'xAxisLine')
@@ -206,16 +237,31 @@
 
         g.append('g')
           .attr('class', 'yAxisLine')
-          .call(d3.axisLeft(yScale));
+          .call(d3.axisLeft(this.yScale));
 
-        // Violin Plots
-
+        g.append('text')
+          .attr('class', 'caption')
+          .attr('x', this.width / 2)
+          .attr('y', this.height - 3 * this.margin.bottom / 4)
+          .text('Parental Income (Percentile)')
+        
+        g.append('text')
+          .attr('class', 'caption')
+          .attr('x', this.margin.left)
+          .attr('y', this.height / 2)
+          .text('# of Students')
+        
+        g.append('text')
+          .attr('class', 'headline')
+          .attr('x', this.width / 3)
+          .attr('y', this.margin.top)
+          .text('College Distribution based on Parental Income')
       },
       getWidth(percentile, value) {
         let extent = this.extents[percentile]
         let xScale = d3.scaleLinear()
           .domain([0, extent.max])
-          .range([0, 100])
+          .range([0, 95])
         return xScale(value)
       }
     },

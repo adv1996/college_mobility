@@ -9,25 +9,37 @@
 </template>
 
 <script>
+  /* eslint-disable */
   import * as d3 from 'd3';
   import _ from 'lodash';
   export default {
-    props: ['tier'],
+    props: ['tier', 'data'],
     data() {
       return {
         height: null,
         width: null,
-        margin: {top: 20, right: 40, bottom: 20, left: 20},
+        margin: {top: 100, right: 40, bottom: 20, left: 20},
         extents: [],
+        area: null,
+        valueline: null,
+        yScale: null,
       }
     },
     watch: {
       tier: function() {
-          console.log('tier change');
-          let svg = d3.select('#brush')
-          svg.selectAll("*").remove();
-          this.setData();
-          this.initGraph();
+        this.setData();
+        
+        let extents = d3.extent(Object.values(this.extents), (d) => d.total)
+
+        this.yScale.domain([extents[1],0])
+
+        let values = d3.select('.brush_group').selectAll('.area2')
+          .data([Object.values(this.extents)])  
+        values.enter().append('path')
+          .merge(values)
+            .attr("class", "area2")
+            .attr("d", this.area);
+        values.exit().remove()
       },
     },
     mounted () {
@@ -49,10 +61,11 @@
           .attr('width', this.width)
         
         const g = svg.append('g')
-          .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
+          .attr("transform", "translate(" + this.margin.left + "," + h/2 + ")")
+          .attr('class', 'brush_group')
 
         let brush = d3.brushX()
-          .extent([[0, this.height / 4], [w, this.height / 2]])
+          .extent([[0, 0], [w, this.height/4]])
           .on("end", this.brushed)
 
         this.xScale = d3.scaleLinear()
@@ -60,51 +73,73 @@
           .range([0, w])
         
         g.append('g')
-          .attr('class', 'xAxisLine')
-          .attr("transform", "translate(" + 0 + "," + h / 2 + ")")
+          .attr('class', 'xAxisLineB')
+          .attr("transform", "translate(" + 0 + "," + h/4 + ")")
           .call(d3.axisBottom(this.xScale));
-        
-        g.append("g")
-          .attr("class", "brush")
-          .call(brush)
-          .call(brush.move, this.xScale.range());
         
         let extents = d3.extent(Object.values(this.extents), (d) => d.total)
         
-        let yScale = d3.scaleLinear()
+        this.yScale = d3.scaleLinear()
           .domain([extents[1], 0])
-          .range([this.margin.top, h])
-
-        this.valueline = d3.line()
-          .x((d) => {
-            return this.xScale(d.k);
-          })
-          .y((d) => {
-            return yScale(d.total);
-          });
+          .range([0, h/4])
         
         this.area = d3.area()
           .x((d) => {
             return this.xScale(d.k);
           })
-          .y0(h)
-          .y1((d) => { return yScale(d.total); });
+          .y0(h/4)
+          .y1((d) => { return this.yScale(d.total); });
         
         let values = g.append('g')
-
         values.selectAll('area2')
           .data([Object.values(this.extents)])
           .enter().append('path')
           .attr("class", "area2")
           .attr("d", this.area);
+        
+        var circleGroup = g.selectAll('circleGroup')
+          .data(['65'])
+          .enter().append('g')
+          .attr('transform',(d) => { return 'translate('+ this.xScale(parseInt(d)) +',' + (this.height/4 + this.margin.bottom) +')'; })
+            .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended));
 
-        // let lineValues = g.append('g')
+        circleGroup.append("circle")
+            .attr('r', 5)
+            .attr('class', 'pointer')
 
-        // lineValues.selectAll('lines2')
-        //   .data([Object.values(this.extents)])
-        //   .enter().append('path')
-        //   .attr("class", "line2")
-        //   .attr("d", this.valueline);
+        circleGroup.append("text")
+          .text((d,i) => { return d; })
+          .style('text-anchor','middle')
+          .attr('y', 20);
+
+        function dragstarted(d) {
+          d3.select(this).raise().classed("active", true);
+        }
+        let that = this;
+        function dragged(d) {
+          if (that.xScale.invert(d3.event.x) >= 0 && that.xScale.invert(d3.event.x) <= 100) {
+            let value = Math.ceil(that.xScale.invert(d3.event.x)).toString()
+            d3.select(this).attr("transform","translate("+(d = d3.event.x)+','+ (that.height/4 + that.margin.bottom) +')' );
+            d3.select(this).select('text')
+              .text(value)
+          }
+        }
+
+        function dragended(d) {
+          d3.select(this).classed("active", false);
+          if (that.xScale.invert(d3.event.x) >= 0 && that.xScale.invert(d3.event.x) <= 100) {
+            let value = Math.ceil(that.xScale.invert(d3.event.x)).toString()
+            that.$store.dispatch('setPercentage', value)
+          }
+        }
+
+        g.append("g")
+          .attr("class", "brush")
+          .call(brush)
+          .call(brush.move, this.xScale.range())
       },
       setData() {
         this.extents = _.mapValues(this.data, (d) => {
@@ -117,8 +152,11 @@
             total: _.find(d, ['tier_name', this.tier]).count
           }
         })
+        this.extents['9'].total = this.extents['9'].total / 18;
       },
       brushed() {
+        if (!d3.event.sourceEvent) return; // Only transition after input.
+        if (!d3.event.selection) return; // Ignore empty selections.
         if (d3.event.selection) {
           let boundaries = d3.event.selection;
           this.$store.dispatch('setBoundary', [parseInt(this.xScale.invert(boundaries[0])), parseInt(this.xScale.invert(boundaries[1]))])
@@ -136,5 +174,8 @@
 }
 .area2 {
   fill: lightsteelblue;
+}
+.pointer {
+  fill: darkgreen;
 }
 </style>

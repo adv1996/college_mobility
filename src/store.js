@@ -7,6 +7,7 @@ const store = new Vuex.Store({
   state: {
     boundary: [0, 100],
     tier: 'Ivy Plus',
+    percentage: '65',
   },
   mutations: {
     resize (state, payload) {
@@ -14,6 +15,9 @@ const store = new Vuex.Store({
     },
     changeTier (state, payload) {
       state.tier = payload
+    },
+    changePercentage (state, payload) {
+      state.percentage = payload;
     }
   },
   getters: {
@@ -22,6 +26,9 @@ const store = new Vuex.Store({
     },
     tier: state => {
       return state.tier
+    },
+    percentage: state => {
+      return state.percentage
     }
   },
   actions: {
@@ -30,6 +37,9 @@ const store = new Vuex.Store({
     },
     setTier({commit}, payload) {
       commit('changeTier', payload)
+    },
+    setPercentage({commit}, payload) {
+      commit('changePercentage', payload)
     }
   }
 })
