@@ -257,7 +257,13 @@
           .attr('x', this.width / 2)
           .attr('y', this.margin.top)
           .style('text-anchor', 'middle')
-          .text('Parental Income Compared to their Children`s College Distribution Tiers')
+          .text((d) => {
+            if (w < 500) {
+              return 'College Income Distributions'
+            }
+            return 'Comparing Parental Income to their Children`s College'
+          })
+
       },
       getWidth(percentile, value) {
         let extent = this.extents[percentile]

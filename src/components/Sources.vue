@@ -2,7 +2,7 @@
   <v-card
     color="black"
     tile
-    height="150"
+    height="200"
   >
     <v-card-title primary-title>
       <div>

@@ -111,10 +111,6 @@
             that.$store.dispatch('setTier', d.tier_name)
             d3.selectAll('.bar')
               .style('opacity', 0.3)
-            // d3.selectAll('.label2')
-            //   .style('opacity', 0.3)
-            // d3.select('.' + d.id)
-            //   .style('opacity', 1)
             d3.select(this)
               .style('opacity', 1)
           })
@@ -140,14 +136,6 @@
           .attr('y', 4 * h / 5 + 24)
           .text(this.percentage + '%')
           .attr('id', 'legend_percentile')
-          .attr('class', 'label subheading')
-          .style('text-anchor', 'middle')
-        
-        //tiers label
-        g.append('text')
-          .attr('x', w / 4)
-          .attr('y', 4 * h / 5 + 24)
-          .text('Higher Education Tiers')
           .attr('class', 'label subheading')
           .style('text-anchor', 'middle')
 
@@ -178,9 +166,6 @@
             return '13px'
           })
           .text((d) => d.tier_name)
-          .style('opacity', (d) => {
-            return d.tier_name === this.$store.getters.tier ? 1 : 0.3;
-          })
           .attr('fill', 'white')
       }
     },

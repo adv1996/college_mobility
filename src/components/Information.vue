@@ -65,11 +65,11 @@
           .attr('class', 'brush_group')
 
         svg.append('text')
-          .attr('x', w/2)
-          .attr('y', this.margin.top - 20)
+          .attr('x', this.margin.left)
+          .attr('y', 40)
           .text('Brush Selection And Legend Pointer')
           .attr('class', 'label title')
-          .style('text-anchor', 'middle')
+          .style('text-anchor', 'start')
 
         let brush = d3.brushX()
           .extent([[0, 0], [w, this.height/4]])
