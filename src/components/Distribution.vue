@@ -27,6 +27,7 @@
         violinYScale: null,
         yScale: null,
         yaxis: null,
+        boxSize: [],
       }
     },
     created () {
@@ -130,7 +131,10 @@
       },
       setDimensions() {
         this.width = this.$el.offsetWidth
-        this.height = this.$el.offsetHeight
+        this.height = this.$el.offsetHeight > this.width ? this.width : this.$el.offsetHeight 
+        let ratio = Math.ceil(this.width / this.height)
+        this.boxSize = [ratio * 18, ratio * 21];
+        console.log('ratio', (this.width / this.height), this.width, this.height)
       },
       initGraph() {
         const h = this.height - this.margin.top - this.margin.bottom;
@@ -163,7 +167,7 @@
         // y scale for violin plots to band the tiers
         this.violinYScale = d3.scaleBand()
           .domain(_.map(this.data['9'], 'id'))
-          .range([h - 75, h])
+          .range([h - this.boxSize[0], h])
         
         this.valueline = d3.line()
           .x((d) => {
@@ -256,20 +260,13 @@
           .attr('x', this.width / 2)
           .attr('y', this.margin.top)
           .style('text-anchor', 'middle')
-          .text('Comparing Higher Education Distribution Tiers across Parental Income Percentiles')
-        
-        // g.append('text')
-        //   .attr('class', 'caption')
-        //   .attr('x', this.width / 3)
-        //   .attr('y', this.margin.top)
-        //   .text('Compare Higher Education Tiers across Parental Income Percentiles')
-        //   .style('text-anchor', 'middle')
+          .text('Comparing Higher Education Distribution Tiers across Parental Income')
       },
       getWidth(percentile, value) {
         let extent = this.extents[percentile]
         let xScale = d3.scaleLinear()
           .domain([0, extent.max])
-          .range([0, 95])
+          .range([0,  this.boxSize[1]])
         return xScale(value)
       }
     },

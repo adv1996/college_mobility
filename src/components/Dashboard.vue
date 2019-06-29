@@ -64,7 +64,7 @@
             tot_count: isNaN(parseFloat(d.tot_count)) ? 0 : parseFloat(d.tot_count),
             k_pctile: d.k_pctile,
             count: isNaN(parseFloat(d.count)) ? 0 : parseFloat(d.count),
-            id: 'tier' + d.tier
+            id: 'tier' + d.tier.replace('.', ''),
           }
         }), 'k_pctile')
       },

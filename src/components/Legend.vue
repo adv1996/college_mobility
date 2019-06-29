@@ -106,7 +106,7 @@
           .attr('x', (d) => this.legendXScale(this.legendExtent[1]) - this.legendXScale(d.density) / 2 + w / 4)
           .attr('y', (d) => this.yScale(d.id))
           .attr('width', (d) => this.legendXScale(d.density))
-          .attr('height', 12.5)
+          .attr('height', h / 32)
           .on('click', function(d) {
             that.$store.dispatch('setTier', d.tier_name)
             d3.selectAll('.bar')
@@ -138,26 +138,26 @@
         g.append('text')
           .attr('x', this.legendXScale(this.legendExtent[1]) + w / 4)
           .attr('y', 4 * h / 5 + 24)
-          .text(this.percentage)
+          .text(this.percentage + '%')
           .attr('id', 'legend_percentile')
           .attr('class', 'headline')
           .style('text-anchor', 'middle')
         
         //tiers label
         g.append('text')
-          .attr('x', w / 4)
+          .attr('x', this.margin.left - 10)
           .attr('y', 4 * h / 5 + 24)
           .text('Higher Education Tiers')
           .attr('class', 'subheading')
-          .style('text-anchor', 'middle')
+          .style('text-anchor', 'start')
 
         //main label
         g.append('text')
-          .attr('x', w / 2)
+          .attr('x', this.margin.left - 10)
           .attr('y', this.margin.top)
           .text('Relative Distribution of College Tiers per Parental Income Percentile')
           .attr('class', 'subheading')
-          .style('text-anchor', 'middle')
+          .style('text-anchor', 'start')
         
         legendBars.selectAll('labels')
           .data(function(d) {
@@ -171,7 +171,12 @@
           .attr('y', (d) => this.yScale(d.id))
           .attr('dy', 10)
           .style('text-anchor', 'middle')
-          .style('font-size', '13px')
+          .style('font-size', (d) => {
+            if (w < 500) {
+              return '8px'
+            }
+            return '13px'
+          })
           .text((d) => d.tier_name)
           .style('opacity', (d) => {
             return d.tier_name === this.$store.getters.tier ? 1 : 0.3;

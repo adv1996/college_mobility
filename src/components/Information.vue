@@ -67,7 +67,7 @@
         svg.append('text')
           .attr('x', w/2)
           .attr('y', this.margin.top)
-          .text('Brush Selection')
+          .text('Brush Selection And Legend Drag and Drop')
           .attr('class', 'subheading')
           .style('text-anchor', 'middle')
 
@@ -120,7 +120,7 @@
         circleGroup.append("text")
           .text((d,i) => { return d; })
           .style('text-anchor','middle')
-          .attr('y', 20);
+          .attr('y', 23);
 
         function dragstarted(d) {
           d3.select(this).raise().classed("active", true);
@@ -137,9 +137,12 @@
 
         function dragended(d) {
           d3.select(this).classed("active", false);
-          if (that.xScale.invert(d3.event.x) >= 0 && that.xScale.invert(d3.event.x) <= 100) {
-            let value = Math.ceil(that.xScale.invert(d3.event.x)).toString()
-            that.$store.dispatch('setPercentage', value)
+          let xValue = Math.ceil(that.xScale.invert(d3.event.x))
+          if (xValue > 17 || xValue === 9) {
+            if (xValue <= 100 ) {
+              let value = xValue.toString()
+              that.$store.dispatch('setPercentage', value)
+            }
           }
         }
 
