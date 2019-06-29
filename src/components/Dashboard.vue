@@ -16,15 +16,21 @@
       >
         <Information :tier="tier" :data="data"/>
       </v-flex>
+      <v-flex
+        xs12
+      >
+        <Sources/>
+      </v-flex>
     </v-layout>
   </v-container>
 </template>
 
 <script>
-  import CollegeMobility from '../data/college_mobility.json';
+  import CollegeMobility from '../data/college_mobility_parental.json';
   import Distribution from '../components/Distribution'
   import Information from '../components/Information'
   import Legend from '../components/Legend'
+  import Sources from '../components/Sources'
   import _ from 'lodash';
   import * as d3 from 'd3';
 
@@ -38,6 +44,7 @@
       Distribution,
       Information,
       Legend,
+      Sources
     },
     created () {
       this.setData();
@@ -62,7 +69,7 @@
             tier_name: d.tier_name,
             density: isNaN(parseFloat(d.density)) ? 0 : parseFloat(d.density),
             tot_count: isNaN(parseFloat(d.tot_count)) ? 0 : parseFloat(d.tot_count),
-            k_pctile: d.k_pctile,
+            k_pctile: d.par_pctile,
             count: isNaN(parseFloat(d.count)) ? 0 : parseFloat(d.count),
             id: 'tier' + d.tier.replace('.', ''),
           }
@@ -98,6 +105,10 @@ div.tooltip {
   pointer-events: none;			
 }
 .selection {
-  fill: darkorange;
+  fill: #F4FF81;
+}
+
+.label {
+  fill: white
 }
 </style>

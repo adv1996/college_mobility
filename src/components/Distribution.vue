@@ -1,6 +1,6 @@
 <template>
   <v-card
-    color="white"
+    color="black"
     tile
     height="455"
   >
@@ -74,9 +74,10 @@
           .transition(1000)
           .call(this.xaxis);
 
+        let dataPoints = this.verfiyDomain(this.boundary)
         if (!_.isEqual(newValue, oldValue)) {
           let violinPlots = d3.select('.main_group').selectAll('.plots')
-            .data(this.verfiyDomain(this.boundary))
+            .data(dataPoints)
             .join('g')
 
           violinPlots.enter().append('g')
@@ -107,12 +108,9 @@
     methods: {
       verfiyDomain(bound) {
         let clamp = (bound[1] - bound[0]) / 12
-        if (bound[0] < 9) {
-          bound[0] = 9
-        }
         let range = d3.range(bound[0], bound[1] + 1, Math.ceil(clamp))
         range = _.filter(range, (d) => {
-          return d === 9 || (d >= 18 && d < 100)
+          return d < 100
         })
         return _.map(range, d => d.toString())
       },
@@ -127,7 +125,6 @@
             total: _.find(d, ['tier_name', this.tier]).count
           }
         })
-        this.extents['9'].total = this.extents['9'].total / 18;
       },
       setDimensions() {
         this.width = this.$el.offsetWidth
@@ -244,23 +241,23 @@
           .call(d3.axisLeft(this.yScale));
 
         g.append('text')
-          .attr('class', 'caption')
+          .attr('class', 'label caption')
           .attr('x', this.width / 2)
           .attr('y', this.height - 3 * this.margin.bottom / 4)
           .text('Parental Income (Percentile)')
         
         g.append('text')
-          .attr('class', 'caption')
+          .attr('class', 'label caption')
           .attr('x', this.margin.left)
           .attr('y', this.height / 2)
-          .text('# of Students')
+          .text('# of Kids')
         
         g.append('text')
-          .attr('class', 'headline')
+          .attr('class', 'label headline')
           .attr('x', this.width / 2)
           .attr('y', this.margin.top)
           .style('text-anchor', 'middle')
-          .text('Comparing Higher Education Distribution Tiers across Parental Income')
+          .text('Parental Income Compared to their Children`s College Distribution Tiers')
       },
       getWidth(percentile, value) {
         let extent = this.extents[percentile]

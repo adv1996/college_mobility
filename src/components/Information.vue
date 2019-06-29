@@ -1,6 +1,6 @@
 <template>
   <v-card
-    color="white"
+    color="black"
     tile
     height="430"
   >
@@ -66,9 +66,9 @@
 
         svg.append('text')
           .attr('x', w/2)
-          .attr('y', this.margin.top)
-          .text('Brush Selection And Legend Drag and Drop')
-          .attr('class', 'subheading')
+          .attr('y', this.margin.top - 20)
+          .text('Brush Selection And Legend Pointer')
+          .attr('class', 'label title')
           .style('text-anchor', 'middle')
 
         let brush = d3.brushX()
@@ -116,16 +116,20 @@
         circleGroup.append("circle")
             .attr('r', 8)
             .attr('class', 'pointer')
+            .style('bor')
 
         circleGroup.append("text")
           .text((d,i) => { return d; })
           .style('text-anchor','middle')
+          .attr('class', 'label')
           .attr('y', 23);
 
         function dragstarted(d) {
           d3.select(this).raise().classed("active", true);
         }
+
         let that = this;
+
         function dragged(d) {
           if (that.xScale.invert(d3.event.x) >= 0 && that.xScale.invert(d3.event.x) <= 100) {
             let value = Math.ceil(that.xScale.invert(d3.event.x)).toString()
@@ -138,11 +142,9 @@
         function dragended(d) {
           d3.select(this).classed("active", false);
           let xValue = Math.ceil(that.xScale.invert(d3.event.x))
-          if (xValue > 17 || xValue === 9) {
-            if (xValue <= 100 ) {
-              let value = xValue.toString()
-              that.$store.dispatch('setPercentage', value)
-            }
+          if (xValue >= 0 && xValue <= 100 ) {
+            let value = xValue.toString()
+            that.$store.dispatch('setPercentage', value)
           }
         }
 
@@ -162,7 +164,6 @@
             total: _.find(d, ['tier_name', this.tier]).count
           }
         })
-        this.extents['9'].total = this.extents['9'].total / 18;
       },
       brushed() {
         if (!d3.event.sourceEvent) return; // Only transition after input.
@@ -186,6 +187,6 @@
   fill: lightsteelblue;
 }
 .pointer {
-  fill: darkorange;
+  fill: #F4FF81;
 }
 </style>

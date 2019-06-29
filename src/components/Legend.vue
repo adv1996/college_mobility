@@ -1,6 +1,6 @@
 <template>
   <v-card
-    color="white"
+    color="black"
     tile
     height="430"
   >
@@ -56,7 +56,7 @@
             .attr('width', (d) => this.legendXScale(d.density))
         bars.exit().remove()
 
-        d3.select('#legend_percentile').text(this.percentage);
+        d3.select('#legend_percentile').text(this.percentage + '%');
       },
     },
     mounted () {
@@ -111,10 +111,10 @@
             that.$store.dispatch('setTier', d.tier_name)
             d3.selectAll('.bar')
               .style('opacity', 0.3)
-            d3.selectAll('.label')
-              .style('opacity', 0.3)
-            d3.select('.' + d.id)
-              .style('opacity', 1)
+            // d3.selectAll('.label2')
+            //   .style('opacity', 0.3)
+            // d3.select('.' + d.id)
+            //   .style('opacity', 1)
             d3.select(this)
               .style('opacity', 1)
           })
@@ -140,23 +140,23 @@
           .attr('y', 4 * h / 5 + 24)
           .text(this.percentage + '%')
           .attr('id', 'legend_percentile')
-          .attr('class', 'headline')
+          .attr('class', 'label subheading')
           .style('text-anchor', 'middle')
         
         //tiers label
         g.append('text')
-          .attr('x', this.margin.left - 10)
+          .attr('x', w / 4)
           .attr('y', 4 * h / 5 + 24)
           .text('Higher Education Tiers')
-          .attr('class', 'subheading')
-          .style('text-anchor', 'start')
+          .attr('class', 'label subheading')
+          .style('text-anchor', 'middle')
 
         //main label
         g.append('text')
           .attr('x', this.margin.left - 10)
           .attr('y', this.margin.top)
-          .text('Relative Distribution of College Tiers per Parental Income Percentile')
-          .attr('class', 'subheading')
+          .text('Relative Distribution of College Tiers Across Income')
+          .attr('class', 'label title')
           .style('text-anchor', 'start')
         
         legendBars.selectAll('labels')
@@ -165,7 +165,7 @@
           })
           .enter().append('text')
           .attr('class', (d) => {
-            return 'label ' + d.id
+            return 'label2 ' + d.id
           })
           .attr('x', (d) => w / 4)
           .attr('y', (d) => this.yScale(d.id))
@@ -181,6 +181,7 @@
           .style('opacity', (d) => {
             return d.tier_name === this.$store.getters.tier ? 1 : 0.3;
           })
+          .attr('fill', 'white')
       }
     },
   }
