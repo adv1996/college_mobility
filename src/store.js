@@ -7,7 +7,7 @@ const store = new Vuex.Store({
   state: {
     boundary: [0, 100],
     tier: 'Ivy Plus',
-    percentage: '65',
+    percentage: '50',
   },
   mutations: {
     resize (state, payload) {

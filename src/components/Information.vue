@@ -105,7 +105,7 @@
           .attr("d", this.area);
         
         var circleGroup = g.selectAll('circleGroup')
-          .data(['65'])
+          .data(['50'])
           .enter().append('g')
           .attr('transform',(d) => { return 'translate('+ this.xScale(parseInt(d)) +',' + (this.height/4 + this.margin.bottom) +')'; })
             .call(d3.drag()
@@ -116,7 +116,6 @@
         circleGroup.append("circle")
             .attr('r', 8)
             .attr('class', 'pointer')
-            .style('bor')
 
         circleGroup.append("text")
           .text((d,i) => { return d; })

@@ -56,7 +56,7 @@
             .attr('width', (d) => this.legendXScale(d.density))
         bars.exit().remove()
 
-        d3.select('#legend_percentile').text(this.percentage + '%');
+        d3.select('#legend_percentile').text(this.percentage + ' Percentile');
       },
     },
     mounted () {
@@ -110,7 +110,7 @@
           .on('click', function(d) {
             that.$store.dispatch('setTier', d.tier_name)
             d3.selectAll('.bar')
-              .style('opacity', 0.3)
+              .style('opacity', 0.6)
             d3.select(this)
               .style('opacity', 1)
           })
@@ -127,14 +127,14 @@
               .style('opacity', 0)
           })
           .style('opacity', (d) => {
-            return d.tier_name === this.$store.getters.tier ? 1 : 0.3;
+            return d.tier_name === this.$store.getters.tier ? 1 : 0.6;
           })
         
         // legend label
         g.append('text')
           .attr('x', this.legendXScale(this.legendExtent[1]) + w / 4)
           .attr('y', 4 * h / 5 + 24)
-          .text(this.percentage + '%')
+          .text(this.percentage + ' Percentile')
           .attr('id', 'legend_percentile')
           .attr('class', 'label subheading')
           .style('text-anchor', 'middle')
